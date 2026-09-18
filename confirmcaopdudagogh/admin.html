@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo — Gestão de Convidados</title>
+  <meta name="description" content="Painel de gerenciamento de convidados e confirmação de presença.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ============ TELA DE LOGIN ============ -->
+  <div id="loginWrapper" class="login-wrapper">
+    <div class="login-card">
+      <h1 class="login-title display">Painel Administrativo</h1>
+      <p class="login-subtitle">Acesso restrito. Insira suas credenciais para continuar.</p>
+
+      <div id="loginError" class="login-error" style="display:none;"></div>
+
+      <form id="loginForm" class="login-form-fields" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" class="input" placeholder="seu@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Senha</label>
+          <input id="loginPassword" type="password" class="input" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button id="loginBtn" type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top:8px;">
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ LAYOUT DO PAINEL (pós-login) ============ -->
+  <div id="adminLayout" class="admin-layout" style="display:none;">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <span class="admin-header-brand display">Gestão de Convidados</span>
+      <div class="admin-header-right">
+        <span id="userEmailDisplay" class="admin-user-email"></span>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm">Sair</button>
+      </div>
+    </header>
+
+    <!-- Navegação por Abas -->
+    <nav class="tab-nav" role="tablist" aria-label="Seções do painel">
+      <button class="tab-btn active" data-tab="tabOverview" role="tab" aria-selected="true">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="tab-label">Visão geral</span>
+      </button>
+      <button class="tab-btn" data-tab="tabCreate" role="tab" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="tab-label">Criar grupo</span>
+      </button>
+      <button class="tab-btn" data-tab="tabGroups" role="tab" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="tab-label">Grupos</span>
+      </button>
+      <button class="tab-btn" data-tab="tabAdmins" role="tab" aria-selected="false">
+        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="tab-label">Administradores</span>
+      </button>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="admin-content">
+
+      <!-- ========== ABA: VISÃO GERAL ========== -->
+      <section id="tabOverview" class="tab-panel active" role="tabpanel">
+        <div class="section-header">
+          <h2 class="section-title display">Visão Geral</h2>
+          <p class="section-description">Resumo em tempo real de todos os convidados e confirmações.</p>
+        </div>
+
+        <!-- Blocos de destaque: Confirmadas / Pendentes / Não vão -->
+        <div class="summary-blocks">
+          <div class="summary-block green">
+            <div class="summary-block-label">Confirmadas</div>
+            <div class="summary-block-value" id="statConfirmadas">0</div>
+          </div>
+          <div class="summary-block amber">
+            <div class="summary-block-label">Pendentes</div>
+            <div class="summary-block-value" id="statPendentes">0</div>
+          </div>
+          <div class="summary-block red">
+            <div class="summary-block-label">Não vão</div>
+            <div class="summary-block-value" id="statNaoVao">0</div>
+          </div>
+        </div>
+
+        <!-- Cards de estatísticas detalhadas -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Grupos</div>
+            <div class="stat-card-number" id="statGroups">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Total de pessoas</div>
+            <div class="stat-card-number" id="statPeople">0</div>
+          </div>
+          <div class="stat-card highlight-blue">
+            <div class="stat-card-label">Adultos</div>
+            <div class="stat-card-number" id="statAdultos">0</div>
+          </div>
+          <div class="stat-card highlight-purple">
+            <div class="stat-card-label">Crianças</div>
+            <div class="stat-card-number" id="statCriancas">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Homens</div>
+            <div class="stat-card-number" id="statHomens">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Mulheres</div>
+            <div class="stat-card-number" id="statMulheres">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== ABA: CRIAR GRUPO ========== -->
+      <section id="tabCreate" class="tab-panel" role="tabpanel">
+        <div class="section-header">
+          <h2 class="section-title display">Criar Grupo</h2>
+          <p class="section-description">Cadastre um novo grupo de convidados com as pessoas individualizadas.</p>
+        </div>
+
+        <div id="createGroupError" class="login-error" style="display:none;margin-bottom:20px;"></div>
+
+        <!-- Nome do Grupo -->
+        <div class="form-section">
+          <div class="form-section-title">Nome do grupo</div>
+          <div class="form-stack">
+            <div class="form-group">
+              <label class="form-label" for="groupNameInput">Nome</label>
+              <input id="groupNameInput" type="text" class="input" placeholder="Ex: Família Silva, Ana Lima">
+              <span class="form-hint">Use um nome que identifique facilmente este convite.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pessoas -->
+        <div class="form-section">
+          <div class="form-section-title">Pessoas do grupo</div>
+
+          <div id="peopleContainer"></div>
+
+          <button id="addPersonBtn" type="button" class="btn btn-secondary" style="margin-top:16px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar pessoa
+          </button>
+        </div>
+
+        <!-- Salvar -->
+        <div style="display:flex;justify-content:flex-end;">
+          <button id="saveGroupBtn" type="button" class="btn btn-primary btn-lg">
+            Salvar grupo
+          </button>
+        </div>
+      </section>
+
+      <!-- ========== ABA: GRUPOS ========== -->
+      <section id="tabGroups" class="tab-panel" role="tabpanel">
+        <div class="section-header">
+          <h2 class="section-title display">Grupos</h2>
+          <p class="section-description">Todos os convites cadastrados. Veja detalhes, copie links e gerencie.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-search">
+            <input id="groupSearchInput" type="search" class="input" placeholder="Pesquisar por nome do grupo ou convidado...">
+          </div>
+        </div>
+
+        <div id="groupListContainer"></div>
+
+        <div id="groupsEmptyState" class="empty-state" style="display:none;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p style="margin-top:16px;font-weight:600;">Nenhum grupo cadastrado</p>
+          <p class="text-muted text-sm" style="margin-top:6px;">Vá até a aba "Criar grupo" para começar.</p>
+        </div>
+      </section>
+
+      <!-- ========== ABA: ADMINISTRADORES ========== -->
+      <section id="tabAdmins" class="tab-panel" role="tabpanel">
+        <div class="section-header">
+          <h2 class="section-title display">Administradores</h2>
+          <p class="section-description">E-mails autorizados a acessar este painel. Coleção <code>adminEmails</code> no Firestore.</p>
+        </div>
+
+        <!-- Adicionar Administrador -->
+        <div class="form-section" style="margin-bottom:32px;">
+          <div class="form-section-title">Adicionar administrador</div>
+          <form id="addAdminForm" class="form-stack">
+            <div class="form-group">
+              <label class="form-label" for="newAdminEmail">E-mail</label>
+              <input id="newAdminEmail" type="email" class="input" placeholder="novoadmin@email.com" required>
+            </div>
+            <div style="display:flex;justify-content:flex-end;">
+              <button type="submit" class="btn btn-primary">Adicionar</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Lista de Administradores -->
+        <div class="section-header" style="margin-bottom:16px;">
+          <h3 style="font-size:0.875rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-secondary);">
+            Administradores cadastrados
+          </h3>
+        </div>
+        <div id="adminList" class="admin-list"></div>
+      </section>
+
+    </main>
+  </div><!-- /adminLayout -->
+
+  <!-- ========== MODAL: DETALHE DO GRUPO ========== -->
+  <div id="groupDetailModal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="groupDetailTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="groupDetailTitle" class="display" style="font-size:1.25rem;color:var(--text-primary);"></h2>
+        <button id="groupDetailClose" class="btn btn-ghost btn-sm btn-icon" aria-label="Fechar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Link do convite -->
+      <div style="margin-bottom:24px;">
+        <label class="form-label" style="display:block;margin-bottom:8px;">Link do convite</label>
+        <div class="invite-link-box">
+          <input id="groupDetailLink" type="text" class="invite-link-text" readonly style="background:transparent;border:none;outline:none;color:var(--text-secondary);font-size:0.8125rem;width:100%;font-family:monospace;">
+          <button id="copyDetailLink" class="btn btn-ghost btn-sm btn-icon" title="Copiar link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="groupDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="appToast" class="toast" style="display:none;"></div>
+
+  <!-- Firebase SDKs (UMD Compat — sem compilação local) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Módulos JS -->
+  <script src="js/firebase.js"></script>
+  <script src="js/grupos.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+</html>

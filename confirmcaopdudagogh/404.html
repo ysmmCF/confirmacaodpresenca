@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página Não Encontrada</title>
+  <script>
+    // Se houver um parâmetro de grupo na URL 404 do GitHub Pages, redireciona para confirmar.html
+    const urlParams = new URLSearchParams(window.location.search);
+    const grupoToken = urlParams.get('grupo');
+    if (grupoToken) {
+      window.location.href = 'confirmar.html?grupo=' + encodeURIComponent(grupoToken);
+    } else {
+      window.location.href = 'index.html';
+    }
+  </script>
+</head>
+<body>
+</body>
+</html>

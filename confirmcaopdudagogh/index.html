@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Convidados</title>
+  <meta name="description" content="Sistema de gestão de convidados e confirmação de presença.">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Redireciona automaticamente se houver token na URL raiz
+    const p = new URLSearchParams(window.location.search).get('grupo');
+    if (p) window.location.replace('confirmar.html?grupo=' + encodeURIComponent(p));
+  </script>
+</head>
+<body>
+
+  <div class="page-wrapper">
+    <div class="card" style="text-align:center;">
+
+      <h1 class="display" style="font-size:1.5rem;color:var(--gold);margin-bottom:8px;">Confirmação de Presença</h1>
+      <p class="text-muted text-sm" style="margin-bottom:28px;line-height:1.7;">
+        Informe o código do seu convite ou acesse o painel administrativo.
+      </p>
+
+      <form id="tokenForm" style="margin-bottom:24px;">
+        <div class="form-group" style="margin-bottom:16px;">
+          <input id="tokenInput" type="text" class="input" placeholder="Código do convite" style="text-align:center;letter-spacing:.05em;">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Acessar meu convite</button>
+      </form>
+
+      <hr class="divider">
+
+      <a href="admin.html" class="btn btn-secondary btn-full" style="text-decoration:none;">
+        Painel Administrativo
+      </a>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('tokenForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const t = document.getElementById('tokenInput').value.trim();
+      if (t) window.location.href = 'confirmar.html?grupo=' + encodeURIComponent(t);
+    });
+  </script>
+
+</body>
+</html>

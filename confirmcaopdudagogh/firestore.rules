@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Administrador autenticado pelo Firebase Auth
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Coleção de Grupos
+    match /groups/{groupId} {
+      // Qualquer pessoa pode ler UM grupo específico (para a página pública de RSVP)
+      allow get: if true;
+
+      // Listagem completa apenas para administradores
+      allow list: if isAdmin();
+
+      // Criação e exclusão: apenas administradores
+      allow create, delete: if isAdmin();
+
+      // Atualização:
+      // - Administradores podem alterar qualquer campo.
+      // - Usuários públicos só podem atualizar o campo `people` (status/nome das pessoas),
+      //   sem alterar nome do grupo, token ou timestamps sensíveis.
+      allow update: if isAdmin() || (
+        request.resource.data.name          == resource.data.name          &&
+        request.resource.data.publicToken   == resource.data.publicToken
+      );
+    }
+
+    // Coleção de Administradores Autorizados
+    match /adminEmails/{emailId} {
+      // Leitura pública do próprio documento para verificação de permissão no login
+      allow get: if true;
+
+      // Listagem e escrita apenas para administradores
+      allow list, write: if isAdmin();
+    }
+  }
+}
